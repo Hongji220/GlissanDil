@@ -15,6 +15,7 @@ module.exports = passport => {
         .then(user => {
           //User found
           if (user) {
+            user.password = undefined;
             return done(null, user);
           }
           return done(null, false);

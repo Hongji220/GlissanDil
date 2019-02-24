@@ -7,6 +7,8 @@ const passport = require("passport");
 // @Importing Route files:
 // @/routes/API/Users
 const users = require("./routes/api/users");
+const questions = require("./routes/api/questions");
+const stats = require("./routes/api/stats");
 
 // Instantiating the Express app
 const app = express();
@@ -35,6 +37,10 @@ require("./config/passport")(passport);
 
 // @UserRoute in ./routes/api/users
 app.use("/api/users", users);
+//@QuestionRoute in ./routes/api/questions
+app.use("/api/questions", questions);
+//@StatRoute in ./routes/api/stats
+app.use("/api/stats", stats);
 
 const port = process.env.PORT || 5000;
 
