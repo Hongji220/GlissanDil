@@ -33,10 +33,14 @@ router.post(
     //Creating new Question Object
     const newQuestion = {
       question: req.body.question,
-      option1: req.body.option1,
-      option2: req.body.option2,
-      option3: req.body.option3,
-      option4: req.body.option4,
+      answers: [
+        {
+          option1: req.body.option1,
+          option2: req.body.option2,
+          option3: req.body.option3,
+          option4: req.body.option4
+        }
+      ],
       answer: req.body.answer
     };
     //Find if User has already submitted questions:
@@ -97,35 +101,44 @@ router.post(
 
 //@route    GET api/questions/multiple
 //@desc     Get all Multiple Choice questions
-//@access   Private
-router.get(
-  "/multiple/all",
-  passport.authenticate("jwt", { session: false }),
-  (req, res) => {
+//@access   Public
+router.get("/multiple/all", (req, res) => {
+  questions = [];
+  Multiple.find().then(multQ => {
     questions = [];
-    Multiple.find().then(multQ => {
-      questions = [];
-      questions.unshift(multQ);
-      res.json(questions);
-    });
-  }
-);
+    questions.unshift(multQ);
+    res.json(questions);
+  });
+});
+
+//@route GET /api/questions/multiple/one
+//@desc     Get One Multiple Choice question
+//@access   Public
+router.get("/multiple/one", (req, res) => {
+  questions = [];
+  Multiple.aggregate([{ $sample: { size: 1 } }]).then(multQ => {
+    res.json(multQ[0].quiz[Math.floor(Math.random() * multQ[0].quiz.length)]);
+  });
+});
 
 //@route    GET api/questions/extended
 //@desc     Get all Extended questions
-//@access   Private
-router.get(
-  "/extended/all",
-  passport.authenticate("jwt", { session: false }),
-  (req, res) => {
-    questions = [];
-    Extended.find().then(extQ => {
-      questions = [];
-      questions.unshift(extQ);
-      res.json(questions);
-    });
-  }
-);
+//@access   Public
+router.get("/extended/all", (req, res) => {
+  Extended.find().then(extQ => {
+    res.json(extQ[0].quiz[Math.floor(Math.random() * extQ[0].quiz.length)]);
+  });
+});
+
+//@route GET /api/questions/extended/one
+//@desc     Get One extended Choice question
+//@access   Public
+router.get("/extended/one", (req, res) => {
+  questions = [];
+  Extended.aggregate([{ $sample: { size: 1 } }]).then(extQ => {
+    res.json(extQ[0].quiz);
+  });
+});
 
 //@route    DELETE api/questions/multiple/:id
 //@desc     Delete specific multiple choice question

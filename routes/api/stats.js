@@ -1,9 +1,6 @@
 //Importing Dependecies
 const express = require("express");
 const router = express.Router();
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const keys = require("../../config/keys");
 const passport = require("passport");
 
 //Load User Model
@@ -33,6 +30,8 @@ router.post(
     };
 
     Stat.findOne({ user: req.user.id }).then(stat => {
+      //Check inputs are valid
+
       //If user already has stats
       if (stat) {
         stat.scores.unshift(newStat);
@@ -56,13 +55,24 @@ router.get(
   "/",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
+    //Check inputs are valid
+
     //Finds the user's Stats
     Stat.findOne({ user: req.user.id })
-      .then(stat => res.json(stat.scores))
+      .then(stat => {
+        if (stat) {
+          res.json(stat.scores);
+        } else {
+          errors = {};
+          errors.noStat = true;
+          res.status(404).json(errors);
+        }
+      })
       //If the User doesn't have any stats
       .catch(err => {
+        errors = {};
         errors.noStat = "This user doesn't have any statistics";
-        res.json(errors);
+        res.status(404).json(errors);
       });
   }
 );

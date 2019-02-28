@@ -42,7 +42,7 @@ router.post("/register", (req, res) => {
           newUser.password = hash;
           newUser
             .save()
-            .then(user => res.json(user))
+            .then(user => res.json([{ success: "New User created" }, user]))
             .catch(err => console.log(err));
         });
       });
@@ -67,7 +67,7 @@ router.post("/login", (req, res) => {
   User.findOne({ email }).then(user => {
     //Check if User exists
     if (!user) {
-      errors.email = "User Not found";
+      errors.email = "Email or Password is incorrect.";
       return res.status(404).json(errors);
     }
     //Check if password is correct
@@ -136,7 +136,7 @@ router.delete(
 );
 
 //@route    GET api/users/current
-//@desc     Return Current User - Testing purposes
+//@desc     Return Current User
 //@access   Private
 router.get(
   "/current",
